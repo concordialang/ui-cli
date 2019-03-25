@@ -1,6 +1,5 @@
-import {Command, flags} from '@oclif/command'
-//import * as core from '/home/willian/Projects/tcc/ui-core'
-import {AstProcessor} from '/home/willian/Projects/tcc/ui-core'
+import { Command, flags } from '@oclif/command'
+import { AstProcessor } from '../../../ui-core/dist/src'
 
 /*
  * Run "npm run build" in the ui-core folder.
@@ -8,20 +7,20 @@ import {AstProcessor} from '/home/willian/Projects/tcc/ui-core'
  * Run the command "cli hello --path /path/to/anyFile.json"
  */
 
-export default class Hello extends Command {
+export default class Generate extends Command {
   static description = 'describe the command here'
 
   static flags = {
-    path: flags.string({char: 'p', description: 'ast file path'}),
+    ast: flags.string({char: 'p', description: 'ast file path'}),
   }
 
   //static args = [{name: 'file'}]
 
   async run() {
-    const {flags} = this.parse(Hello)
+    const { flags } = this.parse(Generate)
     const processor = new AstProcessor()
-    if (flags.path) {
-      const result = await processor.process(flags.path)
+    if (flags.ast) {
+      const result = await processor.process(flags.ast)
       this.log(JSON.stringify(result))
     }
 
