@@ -1,10 +1,39 @@
 {
   "name": "concordialang-ui-cli",
-  "version": "0.0.0",
+  "version": "0.1.0",
+  "license": "AGPL-3.0",
+  "homepage": "https://github.com/concordialang/ui-cli",
+  "bugs": "https://github.com/concordialang/ui-cli/issues",
+  "repository": "concordialang/ui-cli",
+  "keywords": [
+    "oclif"
+  ],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "/bin",
+    "/lib",
+    "/npm-shrinkwrap.json",
+    "/oclif.manifest.json"
+  ],
   "bin": {
-    "concordialang-ui-cli": "./bin/run"
+    "clui": "./bin/run"
   },
-  "bugs": "https://github.com/WillianGoncalves/concordialang-ui-cli/issues",
+  "scripts": {
+    "postpack": "rimraf oclif.manifest.json",
+    "posttest": "tslint -p test -t stylish",
+    "prepack": "rimraf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
+    "test": "nyc --extension .ts mocha --forbid-only \"test/**/*.test.ts\"",
+    "version": "oclif-dev readme && git add README.md"
+  },
+  "oclif": {
+    "commands": "./lib/commands",
+    "bin": "clui",
+    "plugins": [
+      "@oclif/plugin-help",
+      "@oclif/plugin-plugins"
+    ]
+  },
   "dependencies": {
     "@oclif/command": "^1.5.12",
     "@oclif/config": "^1.12.9",
@@ -30,34 +59,5 @@
   },
   "engines": {
     "node": ">=8.0.0"
-  },
-  "files": [
-    "/bin",
-    "/lib",
-    "/npm-shrinkwrap.json",
-    "/oclif.manifest.json"
-  ],
-  "homepage": "https://github.com/WillianGoncalves/concordialang-ui-cli",
-  "keywords": [
-    "oclif"
-  ],
-  "license": "MIT",
-  "main": "lib/index.js",
-  "oclif": {
-    "commands": "./lib/commands",
-    "bin": "concordialang-ui-cli",
-    "plugins": [
-      "@oclif/plugin-help",
-      "@oclif/plugin-plugins"
-    ]
-  },
-  "repository": "WillianGoncalves/concordialang-ui-cli",
-  "scripts": {
-    "postpack": "rimraf oclif.manifest.json",
-    "posttest": "tslint -p test -t stylish",
-    "prepack": "rimraf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
-    "test": "nyc --extension .ts mocha --forbid-only \"test/**/*.test.ts\"",
-    "version": "oclif-dev readme && git add README.md"
-  },
-  "types": "lib/index.d.ts"
+  }
 }
