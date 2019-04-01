@@ -1,5 +1,5 @@
-import { Command, flags } from '@oclif/command'
-import { AstProcessor } from '../../../ui-core/dist/src'
+import {Command, flags} from '@oclif/command'
+import {AstProcessor, ProcessResult} from '/home/willian/Projects/tcc/ui-core'
 
 /*
  * Run "npm run build" in the ui-core folder.
@@ -11,23 +11,26 @@ export default class Generate extends Command {
   static description = 'describe the command here'
 
   static flags = {
-    ast: flags.string({char: 'p', description: 'ast file path'}),
+    ast: flags.string({char: 'a', description: 'ast file path'}),
+    plugin: flags.string({char: 'p', description: 'plugin which will generate the UI'})
   }
 
   //static args = [{name: 'file'}]
 
   async run() {
-    const { flags } = this.parse(Generate)
+    const {flags} = this.parse(Generate)
+
+    let result: ProcessResult
     const processor = new AstProcessor()
     if (flags.ast) {
-      const result = await processor.process(flags.ast)
-      this.log(JSON.stringify(result))
+      result = await processor.processAstFile(flags.ast)
     }
 
-    //const name = flags.name || 'world'
-    //this.log(`hello ${name} from .\\src\\commands\\hello.ts`)
-    //if (args.file && flags.force) {
-      //this.log(`you input --force and --file: ${args.file}`)
-    //}
+    for (let plugin of this.config.plugins) {
+      if (plugin.name === flags.plugin) {
+        const command = plugin.findCommand('generate')
+        await command.run(['--features', JSON.stringify(result)])
+      }
+    }
   }
 }
