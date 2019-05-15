@@ -1,5 +1,5 @@
 import {Command, flags} from '@oclif/command'
-import {AstProcessor, ProcessResult} from '/home/willian/Projects/tcc/ui-core'
+import {AstProcessor, ProcessResult} from 'concordialang-ui-core'
 
 /*
  * Run "npm run build" in the ui-core folder.
