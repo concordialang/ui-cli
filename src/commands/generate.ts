@@ -1,12 +1,7 @@
 import {Command, flags} from '@oclif/command'
+import {IPlugin} from '@oclif/config'
 import {AstProcessor, ProcessResult} from 'concordialang-ui-core'
 const cosmiconfig = require('cosmiconfig')
-
-/*
- * Run "npm run build" in the ui-core folder.
- * Then, set the right path to AstProcessor.
- * Run the command "cli hello --path /path/to/anyFile.json"
- */
 
 export default class Generate extends Command {
   static description = 'describe the command here'
@@ -18,42 +13,40 @@ export default class Generate extends Command {
   }
 
   async run() {
-    const {ast, pluginName, outputDir} = this.getCommandParams()
+    try {
+      const {ast, pluginName, outputDir} = this.getCommandParams()
 
-    if (!outputDir) this.error('You must provide an output directory')
+      if (!ast) throw new Error('You must provide a valid ast file path')
+      if (!pluginName) throw new Error('You must provide a plugin')
 
-    let result: ProcessResult
+      const plugin: IPlugin | undefined = this.config.plugins.find(p => p.name === pluginName)
+      if (!plugin) throw new Error(`Plugin ${pluginName} not found`)
 
-    if (ast) {
       const processor = new AstProcessor()
-      result = await processor.processAstFile(ast)
-    } else {
-      this.error('You must provide a valid ast file path')
-    }
-
-    const plugin = this.config.plugins.find(p => p.name === pluginName)
-
-    if (plugin) {
-      const command = plugin.findCommand('generate')
+      const result: ProcessResult = await processor.processAstFile(ast)
+      const command = plugin.findCommand('generate', {must: true})
       await command.run(['--features', JSON.stringify(result), '--outputDir', outputDir])
-    } else {
-      this.error(`Plugin ${pluginName} not found`)
+    } catch (e) {
+      this.error(e.message)
     }
   }
 
   private getCommandParams(): any {
     const {flags} = this.parse(Generate)
+    const DEFAULT_OUTPUT_DIR = '.'
 
-    const ast: string = this.getParamFromConfigFile('ast') || flags.ast
-    const pluginName: string = this.getParamFromConfigFile('plugin') || flags.plugin
-    const outputDir: string = this.getParamFromConfigFile('outputDir') || flags.outputDir
+    const ast: string = flags.ast || this.getParamFromConfigFile('ast')
+    const pluginName: string = flags.plugin || this.getParamFromConfigFile('plugin')
+    const outputDir: string = flags.outputDir || this.getParamFromConfigFile('outputDir') || DEFAULT_OUTPUT_DIR
 
     return {ast, pluginName, outputDir}
   }
 
   private getParamFromConfigFile(param: string): any {
-    const explorer = cosmiconfig('ui-cli')
-    const result = explorer.loadSync('.clirc')
-    return result.config ? result.config[param] : null
+    // TODO: Because moduleName is "cli", the expected config file is ".clirc.json". Replace it with the final CLI name.
+    const moduleName = 'cli'
+    const explorer = cosmiconfig(moduleName)
+    const result = explorer.searchSync()
+    return result ? result.config[param] : null
   }
 }
