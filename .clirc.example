@@ -1,0 +1,5 @@
+{
+  "ast": "/path/to/ast.json",
+  "plugin": "concordialang-ui-html",
+  "outputDir": "/path/to/outputs"
+}
